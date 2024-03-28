@@ -1,0 +1,20 @@
+﻿<p role="status">Mayor 1: @PrimerPremio.Mayor Serie 1: @PrimerPremio.Serie </p>
+<p role="status">Mayor 2: @SegundoPremio.Mayor Serie 2: @SegundoPremio.Serie </p>
+<p role="status">Mayor 3: @TercerPremio.Mayor Serie 3: @TercerPremio.Serie </p>
+<p role="status">Velocidad: @VelocidadDeseada </p>
+<p role="status">Simulacion en progreso: @SimulacionEnProgreso </p>
+
+<MudButtonGroup Color="Color.Primary" Variant="Variant.Text">
+    <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Lenta)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Lenta)">Lenta</MudButton>
+    <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Media)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Media)">Media</MudButton>
+    <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Rapida)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Rapida)">Rapida</MudButton>
+</MudButtonGroup>
+
+@if (@SimulacionEnProgreso)
+{
+    <MudButton @onclick="() => DetenerSimulacion()">Detener</MudButton>
+}
+else
+{
+    <MudButton @onclick="() => IniciarSimulacion()">Iniciar</MudButton>
+}
