@@ -1,21 +1,67 @@
 ﻿@page "/"
 @using VisualizacionLoteria.Pages.Components
+@inject IDialogService DialogService
+
 <PageTitle>Simulación</PageTitle>
 
 <MudContainer Class="mt-10 px-8" MaxWidth="MaxWidth.False">
     <MudText Typo="Typo.h3" Align="Align.Center" >Simular la lotería nacional</MudText>
     <MudText Typo="Typo.subtitle1" Align="Align.Center" >Detalles y reglas</MudText>
     <MudGrid Class="mt-10" Justify="Justify.Center">
-        <MudItem xs="12" md="5">
+        <MudItem xs="12" md="4">
             <MudPaper Class="p-4">
                 <MudText Typo="Typo.h4" Align="Align.Center">Simulación</MudText>
-                <Simulacion />
+                <MudText Typo="Typo.h5">Paso 1: Seleccione el número o números a jugar</MudText>
+                
+                <MudPaper Class="pa-3 mt-4">
+                    <MudGrid Justify="Justify.Center">
+                        <MudItem xs="12" md="5">
+                            <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+                                Seleccionar número
+                            </MudButton>
+
+                            <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+                                <TitleContent>
+                                    <MudText Typo="Typo.h6">
+                                        <MudIcon Icon="@Icons.Material.Filled.AddCircle" Class="mr-3" /> Seleccione número y fracciones a jugar
+                                    </MudText>
+                                </TitleContent>
+                                <DialogContent>
+                                    <MudItem Class="mt-4 px-4">
+                                        <MudNumericField HideSpinButtons="true" @bind-Value="NumeroMayorDeseado" Label="Número" Variant="Variant.Outlined" Min="1" Max="99" />
+                                    </MudItem>
+                                    <MudItem Class="mt-4 px-4">
+                                        <MudNumericField HideSpinButtons="true" @bind-Value="NumeroDeFracciones" Label="Cantidad de fracciones" Variant="Variant.Outlined" Min="1" Max="99" />
+                                    </MudItem>
+                                </DialogContent>
+                                <DialogActions>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="Submit" Class="px-10">Cancelar</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Submit" Class="px-10">Añadir número</MudButton>
+                                </DialogActions>
+                            </MudDialog>
+
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+                
+                <MudItem Class="mt-4">
+                    <Simulacion />
+                </MudItem>
             </MudPaper>
         </MudItem>
-        <MudItem xs="12" md="3">
+        <MudItem xs="12" md="2">
             <MudPaper Class="p-4">
                 <h2 class="text-2xl font-bold">Estadísticas</h2>
             </MudPaper>
         </MudItem>        
     </MudGrid>
 </MudContainer>
+
+@code {
+    public int NumeroMayorDeseado { get; set; }
+    public int NumeroDeFracciones { get; set; }
+    private bool visible;
+    private void OpenDialog() => visible = true;
+    void Submit() => visible = false;
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+}
