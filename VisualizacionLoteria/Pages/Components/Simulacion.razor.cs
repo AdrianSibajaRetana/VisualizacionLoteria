@@ -15,20 +15,21 @@ public partial class Simulacion
     private TiqueteDeLoteria SegundoPremio { get; set; } = new TiqueteDeLoteria();
     private TiqueteDeLoteria TercerPremio { get; set; } = new TiqueteDeLoteria();
     private TiqueteDeLoteria TiqueteComprado { get; set; } = new TiqueteDeLoteria();
+    private int NumeroMayorDeseado { get; set; } = 1;
     private bool SimulacionEnProgreso { get; set; } = false;
     private System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
 
     public Simulacion()
     {
-        this.GenerarTiquetes();
+        this.GenerarNumerosGanadoresYTiqueteComprado();
     }
 
-    private void GenerarTiquetes()
+    private void GenerarNumerosGanadoresYTiqueteComprado()
     {
-        this.PrimerPremio.GenerarPremio();
-        this.SegundoPremio.GenerarPremio();
-        this.TercerPremio.GenerarPremio();
-        this.TiqueteComprado.GenerarPremio();
+        this.PrimerPremio.GenerarMayorYSerie();
+        this.SegundoPremio.GenerarMayorYSerie();
+        this.TercerPremio.GenerarMayorYSerie();
+        this.TiqueteComprado.GenerarMayorYSerie(NumeroMayorDeseado);
     }
 
     private void SetearVelocidad(VelocidadDeSimulacion velocidad)
@@ -80,7 +81,7 @@ public partial class Simulacion
             this.Timer.Start();
             this.VelocidadActual = this.VelocidadDeseada;
         }
-        this.GenerarTiquetes();
+        this.GenerarNumerosGanadoresYTiqueteComprado();
         StateHasChanged();
     }
 
@@ -93,12 +94,19 @@ public partial class Simulacion
 
         public TiqueteDeLoteria()
         {
-            this.GenerarPremio();
+            this.GenerarMayorYSerie();
         }
 
-        public void GenerarPremio()
+        public void GenerarMayorYSerie(int? mayor = null)
         {
-            this.Mayor = new Random().Next(0, 99);
+            if(mayor.HasValue)
+            {
+                this.Mayor = mayor.Value;
+            }
+            else
+            {
+                this.Mayor = new Random().Next(0, 99);
+            }
             this.Serie = new Random().Next(0, 999);
         }
     }

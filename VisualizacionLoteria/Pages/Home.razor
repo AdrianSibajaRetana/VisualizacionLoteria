@@ -1,4 +1,21 @@
 ﻿@page "/"
 @using VisualizacionLoteria.Pages.Components
 <PageTitle>Simulación</PageTitle>
-<Simulacion/>
+
+<MudContainer Class="mt-10 px-8" MaxWidth="MaxWidth.False">
+    <MudText Typo="Typo.h3" Align="Align.Center" >Simular la lotería nacional</MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" >Detalles y reglas</MudText>
+    <MudGrid Class="mt-10" Justify="Justify.Center">
+        <MudItem xs="12" md="5">
+            <MudPaper Class="p-4">
+                <MudText Typo="Typo.h4" Align="Align.Center">Simulación</MudText>
+                <Simulacion />
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudPaper Class="p-4">
+                <h2 class="text-2xl font-bold">Estadísticas</h2>
+            </MudPaper>
+        </MudItem>        
+    </MudGrid>
+</MudContainer>
