@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using VisualizacionLoteria.Pages.Components
+@using VisualizacionLoteria.Pages.Models;
 @inject IDialogService DialogService
 
 <PageTitle>Simulación</PageTitle>
@@ -15,32 +16,40 @@
                 
                 <MudPaper Class="pa-3 mt-4">
                     <MudGrid Justify="Justify.Center">
-                        <MudItem xs="12" md="5">
-                            <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
-                                Seleccionar número
-                            </MudButton>
-
-                            <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
-                                <TitleContent>
-                                    <MudText Typo="Typo.h6">
-                                        <MudIcon Icon="@Icons.Material.Filled.AddCircle" Class="mr-3" /> Seleccione número y fracciones a jugar
-                                    </MudText>
-                                </TitleContent>
-                                <DialogContent>
-                                    <MudItem Class="mt-4 px-4">
-                                        <MudNumericField HideSpinButtons="true" @bind-Value="NumeroMayorDeseado" Label="Número" Variant="Variant.Outlined" Min="1" Max="99" />
-                                    </MudItem>
-                                    <MudItem Class="mt-4 px-4">
-                                        <MudNumericField HideSpinButtons="true" @bind-Value="NumeroDeFracciones" Label="Cantidad de fracciones" Variant="Variant.Outlined" Min="1" Max="99" />
-                                    </MudItem>
-                                </DialogContent>
-                                <DialogActions>
-                                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="Submit" Class="px-10">Cancelar</MudButton>
-                                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Submit" Class="px-10">Añadir número</MudButton>
-                                </DialogActions>
-                            </MudDialog>
-
-                        </MudItem>
+                            @if (NumerosJugados.Any())
+                            {
+                                <MudItem xs="12" md="10">
+                                    <MudDataGrid Items="@NumerosJugados" Filterable="false" SortMode="@SortMode.None" Groupable="false">
+                                    <ToolBarContent>
+                                        <MudText Typo="Typo.h6">Números y fracciones</MudText>
+                                    </ToolBarContent>
+                                        <Columns>
+                                            <PropertyColumn Property="x => x.NumeroMayor" Title="Numero mayor" />
+                                            <PropertyColumn Property="x => x.NumeroDeFracciones" Title="Fracciones" />
+                                            <TemplateColumn CellClass="d-flex justify-end">
+                                                <CellTemplate>
+                                                    <MudStack Row>
+                                                        <MudIconButton OnClick="@(() => BorrarNumero(@context.Item))" Color="@Color.Default" Icon="@Icons.Material.Filled.Delete" />
+                                                    </MudStack>
+                                                </CellTemplate>
+                                            </TemplateColumn>
+                                        </Columns>
+                                    </MudDataGrid>
+                                </MudItem>
+                                <MudItem xs="12" md="10" Class="mt-5">
+                                    <MudButton @onclick="AñadirNumero" Variant="Variant.Filled" Color="Color.Primary">
+                                        Añadir otro número
+                                    </MudButton>
+                                </MudItem>
+                            }
+                            else
+                            {
+                                <MudItem xs="12" md="5">
+                                    <MudButton @onclick="AñadirNumero" Variant="Variant.Filled" Color="Color.Primary">
+                                        Seleccionar número
+                                    </MudButton>
+                                </MudItem>
+                            }                            
                     </MudGrid>
                 </MudPaper>
                 
@@ -57,11 +66,28 @@
     </MudGrid>
 </MudContainer>
 
-@code {
-    public int NumeroMayorDeseado { get; set; }
-    public int NumeroDeFracciones { get; set; }
-    private bool visible;
-    private void OpenDialog() => visible = true;
-    void Submit() => visible = false;
-    private DialogOptions dialogOptions = new() { FullWidth = true };
+@code
+{
+    public List<LoteriaComprada> NumerosJugados { get; set; } = new List<LoteriaComprada>();
+
+    async Task AñadirNumero()
+    {
+        var parameters = new DialogParameters<Dialogo>();
+
+        var dialog = await DialogService.ShowAsync<Dialogo>("Añadir número", parameters);
+        var result = await dialog.Result;
+
+
+        if (!result.Canceled)
+        {
+            //In a real world scenario we would reload the data from the source here since we "removed" it in the dialog already.
+            LoteriaComprada loteriaComprada = (LoteriaComprada)result.Data;
+            NumerosJugados.Add(loteriaComprada);
+        }
+    }
+
+    void BorrarNumero(LoteriaComprada item)
+    {
+        NumerosJugados.Remove(item);
+    }
 }
