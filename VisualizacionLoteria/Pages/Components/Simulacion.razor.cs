@@ -17,6 +17,7 @@ public partial class Simulacion
     private TiqueteDeLoteria TiqueteComprado { get; set; } = new TiqueteDeLoteria();
     private int NumeroMayorDeseado { get; set; } = 1;
     private bool SimulacionEnProgreso { get; set; } = false;
+    private bool HaSimulado { get; set; } = false;
     private System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
 
     public Simulacion()
@@ -44,6 +45,7 @@ public partial class Simulacion
 
     private void IniciarSimulacion()
     {
+        this.HaSimulado = true;
         this.SimulacionEnProgreso = true;
         Timer = new System.Timers.Timer(ConseguirTiempoDeEspera());
         Timer.Elapsed += OnTimerElapsed;

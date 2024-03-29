@@ -1,20 +1,94 @@
-﻿<p role="status">Mayor 1: @PrimerPremio.Mayor Serie 1: @PrimerPremio.Serie </p>
-<p role="status">Mayor 2: @SegundoPremio.Mayor Serie 2: @SegundoPremio.Serie </p>
-<p role="status">Mayor 3: @TercerPremio.Mayor Serie 3: @TercerPremio.Serie </p>
-<p role="status">Velocidad: @VelocidadDeseada </p>
-<p role="status">Simulacion en progreso: @SimulacionEnProgreso </p>
+﻿<MudGrid Justify="Justify.Center" Class="mt-5">
+    @*Botón para inciar simulación*@
+    <MudItem xs="12" md="8">
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12" md="10">
+                    <MudGrid Justify="Justify.Center">
+                        @if (@SimulacionEnProgreso)
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" @onclick="() => DetenerSimulacion()">Detener</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" @onclick="() => IniciarSimulacion()">Simular</MudButton>
+                        }
+                    </MudGrid>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
 
-<MudButtonGroup Color="Color.Primary" Variant="Variant.Text">
-    <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Lenta)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Lenta)">Lenta</MudButton>
-    <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Media)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Media)">Media</MudButton>
-    <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Rapida)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Rapida)">Rapida</MudButton>
-</MudButtonGroup>
-
-@if (@SimulacionEnProgreso)
-{
-    <MudButton @onclick="() => DetenerSimulacion()">Detener</MudButton>
-}
-else
-{
-    <MudButton @onclick="() => IniciarSimulacion()">Iniciar</MudButton>
-}
+    @if(HaSimulado)
+    {
+        @*Settear velocidad de simulación*@
+        <MudItem xs="12" md="8">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" md="10">
+                    <MudCard Style="width: 100%">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">Estadísticas</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudSimpleTable Style="overflow-x: auto;">
+                                <thead>
+                                    <tr>
+                                        <th>Estadística</th>
+                                        <th>Número</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Precio por fracción</td>
+                                        <td>₡2000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fracciones jugadas</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Loterías jugadas</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dinero gastado</td>
+                                        <td>₡0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dinero ganado</td>
+                                        <td>₡0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Balance total</td>
+                                        <td>₡0</td>
+                                    </tr>
+                                </tbody>
+                            </MudSimpleTable>
+                        </MudCardContent>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">Velocidad</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardActions>
+                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Text">
+                                <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Lenta)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Lenta)">Lenta</MudButton>
+                                <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Media)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Media)">Media</MudButton>
+                                <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Rapida)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Rapida)">Rápida</MudButton>
+                            </MudButtonGroup>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        
+        <MudItem xs="12" md="10">
+            
+        </MudItem>
+        <p role="status">Mayor 1: @PrimerPremio.Mayor Serie 1: @PrimerPremio.Serie </p>
+        <p role="status">Mayor 2: @SegundoPremio.Mayor Serie 2: @SegundoPremio.Serie </p>
+        <p role="status">Mayor 3: @TercerPremio.Mayor Serie 3: @TercerPremio.Serie </p>
+        <p role="status">Velocidad: @VelocidadDeseada </p>
+        <p role="status">Simulacion en progreso: @SimulacionEnProgreso </p>
+    }
+</MudGrid>

@@ -5,70 +5,46 @@
 
 <PageTitle>Simulación</PageTitle>
 
-<MudContainer Class="mt-10 px-8" MaxWidth="MaxWidth.False">
+<MudContainer Class="px-8" MaxWidth="MaxWidth.False">
     <MudText Typo="Typo.h3" Align="Align.Center" >Simular la lotería nacional</MudText>
-    <MudText Typo="Typo.subtitle1" Align="Align.Center" >Detalles y reglas</MudText>
-    <MudGrid Class="mt-10" Justify="Justify.Center">
-        <MudItem xs="12" md="4">
-            <MudPaper Class="p-4">
-                <MudText Typo="Typo.h4" Align="Align.Center">Simulación</MudText>
-                <MudText Typo="Typo.h5">Paso 1: Seleccione el número o números a jugar</MudText>
-                
-                <MudPaper Class="pa-3 mt-4">
-                    <MudGrid Justify="Justify.Center">
-                            @if (NumerosJugados.Any())
-                            {
-                                <MudItem xs="12" md="10">
-                                    <MudDataGrid Items="@NumerosJugados" Filterable="false" SortMode="@SortMode.None" Groupable="false">
-                                    <ToolBarContent>
-                                        <MudText Typo="Typo.h6">Números y fracciones</MudText>
-                                    </ToolBarContent>
-                                        <Columns>
-                                            <PropertyColumn Property="x => x.NumeroMayor" Title="Numero mayor" />
-                                            <PropertyColumn Property="x => x.NumeroDeFracciones" Title="Fracciones" />
-                                            <TemplateColumn CellClass="d-flex justify-end">
-                                                <CellTemplate>
-                                                    <MudStack Row>
-                                                        <MudIconButton OnClick="@(() => BorrarNumero(@context.Item))" Color="@Color.Default" Icon="@Icons.Material.Filled.Delete" />
-                                                    </MudStack>
-                                                </CellTemplate>
-                                            </TemplateColumn>
-                                        </Columns>
-                                    </MudDataGrid>
-                                </MudItem>
-                                <MudItem xs="12" md="10" Class="mt-5">
-                                    <MudButton @onclick="AñadirNumero" Variant="Variant.Filled" Color="Color.Primary">
-                                        Añadir otro número
-                                    </MudButton>
-                                </MudItem>
-                            }
-                            else
-                            {
-                                <MudItem xs="12" md="5">
-                                    <MudButton @onclick="AñadirNumero" Variant="Variant.Filled" Color="Color.Primary">
-                                        Seleccionar número
-                                    </MudButton>
-                                </MudItem>
-                            }                            
-                    </MudGrid>
-                </MudPaper>
-                
-                <MudItem Class="mt-4">
-                    <Simulacion />
-                </MudItem>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" md="2">
-            <MudPaper Class="p-4">
-                <h2 class="text-2xl font-bold">Estadísticas</h2>
-            </MudPaper>
-        </MudItem>        
+    <MudGrid Class="mt-5" Justify="Justify.Center">
+
+        <MudItem xs="12" md="8">
+            @*Selección de números.*@
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" md="10">
+                    <MudDataGrid Items="@NumerosJugados" Filterable="false" SortMode="@SortMode.None" Groupable="false">
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6">Números y fracciones a jugar</MudText>
+                            <MudSpacer />
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" @onclick="AñadirNumero">@mensajeDeboton</MudButton>
+                        </ToolBarContent>
+                        <Columns>
+                            <PropertyColumn Property="x => x.NumeroMayor" Title="Numero mayor" />
+                            <PropertyColumn Property="x => x.NumeroDeFracciones" Title="Fracciones" />
+                            <TemplateColumn CellClass="d-flex justify-end">
+                                <CellTemplate>
+                                    <MudStack Row>
+                                        <MudIconButton OnClick="@(() => BorrarNumero(@context.Item))" Color="@Color.Default" Icon="@Icons.Material.Filled.Delete" />
+                                    </MudStack>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </MudItem>                                                
+            </MudGrid>
+            
+        </MudItem>       
     </MudGrid>
+    @*Simulación*@
+    <Simulacion />         
+
 </MudContainer>
 
 @code
 {
     public List<LoteriaComprada> NumerosJugados { get; set; } = new List<LoteriaComprada>();
+    private string mensajeDeboton = "Añadir número";
 
     async Task AñadirNumero()
     {
@@ -84,10 +60,30 @@
             LoteriaComprada loteriaComprada = (LoteriaComprada)result.Data;
             NumerosJugados.Add(loteriaComprada);
         }
+        cambiarMensajeDeBoton();
+
     }
 
     void BorrarNumero(LoteriaComprada item)
     {
         NumerosJugados.Remove(item);
+        cambiarMensajeDeBoton();
     }
+
+    void cambiarMensajeDeBoton()
+    {
+        if (NumerosJugados.Any())
+        {
+            mensajeDeboton = "Añadir otro número";
+        }
+        else
+        {
+            mensajeDeboton = "Añadir número";
+        }
+
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }   
 }
