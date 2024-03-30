@@ -100,7 +100,7 @@ public partial class Simulacion
         if (NumerosJugados != null && NumerosJugados.Any())
         {
             this.GenerarNumerosGanadoresYTiqueteComprado();
-            this.EvaluarLotería();
+            this.EvaluarLoteria();
             StateHasChanged();
         }
         else
@@ -162,7 +162,7 @@ public partial class Simulacion
         }
     }
 
-    private void EvaluarLotería()
+    private void EvaluarLoteria()
     {        
         this.LoteriasJugadas++;
         int dineroGanadoEnRonda = 0;
