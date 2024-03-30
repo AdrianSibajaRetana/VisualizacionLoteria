@@ -1,4 +1,6 @@
-﻿<MudGrid Justify="Justify.Center" Class="mt-5">
+﻿@inject ISnackbar Snackbar
+
+<MudGrid Justify="Justify.Center" Class="mt-5">
     @*Botón para inciar simulación*@
     <MudItem xs="12" md="8">
         <MudGrid Justify="Justify.Center">
@@ -10,7 +12,7 @@
                         }
                         else
                         {
-                            <MudButton Variant="Variant.Filled" Color="Color.Info" @onclick="() => IniciarSimulacion()">Simular</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" @onclick="() => IniciarSimulacion()" Disabled="@DeshabilitarBotonDeInicio">Simular</MudButton>
                         }
                     </MudGrid>
             </MudItem>
@@ -40,27 +42,27 @@
                                 <tbody>
                                     <tr>
                                         <td>Precio por fracción</td>
-                                        <td>₡2000</td>
+                                        <td>₡@PrecioPorFraccion</td>
                                     </tr>
                                     <tr>
                                         <td>Fracciones jugadas</td>
-                                        <td>0</td>
+                                        <td>@FraccionesJugadas</td>
                                     </tr>
                                     <tr>
                                         <td>Loterías jugadas</td>
-                                        <td>0</td>
+                                        <td>@LoteriasJugadas</td>
                                     </tr>
                                     <tr>
                                         <td>Dinero gastado</td>
-                                        <td>₡0</td>
+                                        <td>₡@DineroGastado</td>
                                     </tr>
                                     <tr>
                                         <td>Dinero ganado</td>
-                                        <td>₡0</td>
+                                        <td>₡@DineroGanado</td>
                                     </tr>
                                     <tr>
                                         <td>Balance total</td>
-                                        <td>₡0</td>
+                                        <td>₡@BalanceTotal</td>
                                     </tr>
                                 </tbody>
                             </MudSimpleTable>
@@ -84,11 +86,10 @@
         
         <MudItem xs="12" md="10">
             
+            @foreach(var numero in NumerosJugadosParam)
+            {
+                <p role="status">Numero: @numero.NumeroMayor Fracciones: @numero.NumeroDeFracciones </p>
+            }
         </MudItem>
-        <p role="status">Mayor 1: @PrimerPremio.Mayor Serie 1: @PrimerPremio.Serie </p>
-        <p role="status">Mayor 2: @SegundoPremio.Mayor Serie 2: @SegundoPremio.Serie </p>
-        <p role="status">Mayor 3: @TercerPremio.Mayor Serie 3: @TercerPremio.Serie </p>
-        <p role="status">Velocidad: @VelocidadDeseada </p>
-        <p role="status">Simulacion en progreso: @SimulacionEnProgreso </p>
     }
 </MudGrid>
