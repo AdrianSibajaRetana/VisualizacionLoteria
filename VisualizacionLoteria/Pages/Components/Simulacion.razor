@@ -42,7 +42,7 @@
                                 <tbody>
                                     <tr>
                                         <td>Precio por fracción</td>
-                                        <td>₡@PrecioPorFraccion</td>
+                                        <td>₡@String.Format("{0:N0}", PrecioPorFraccion)</td>
                                     </tr>
                                     <tr>
                                         <td>Fracciones jugadas</td>
@@ -54,15 +54,15 @@
                                     </tr>
                                     <tr>
                                         <td>Dinero gastado</td>
-                                        <td>₡@DineroGastado</td>
+                                        <td>₡@String.Format("{0:N0}", DineroGastado)</td>
                                     </tr>
                                     <tr>
                                         <td>Dinero ganado</td>
-                                        <td>₡@DineroGanado</td>
+                                        <td>₡@String.Format("{0:N0}", DineroGanado)</td>
                                     </tr>
                                     <tr>
                                         <td>Balance total</td>
-                                        <td>₡@BalanceTotal</td>
+                                        <td>₡@String.Format("{0:N0}", BalanceTotal)</td>
                                     </tr>
                                 </tbody>
                             </MudSimpleTable>

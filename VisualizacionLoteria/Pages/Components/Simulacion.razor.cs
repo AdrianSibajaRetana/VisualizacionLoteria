@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Globalization;
 using VisualizacionLoteria.Pages.Models;
 using static MudBlazor.Colors;
 
@@ -25,17 +26,19 @@ public partial class Simulacion
     private TiqueteDeLoteria PrimerPremio { get; set; } = new TiqueteDeLoteria();
     private TiqueteDeLoteria SegundoPremio { get; set; } = new TiqueteDeLoteria();
     private TiqueteDeLoteria TercerPremio { get; set; } = new TiqueteDeLoteria();
+    private int NumeroDuplicador { get; set; } = 0;
     private List<TiqueteDeLoteria> LoteriaJugada { get; set; } = new List<TiqueteDeLoteria>();
     private bool SimulacionEnProgreso { get; set; } = false;
     private bool HaSimulado { get; set; } = false;
     private System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
     private Random GeneradorDeNumerosAleatorios { get; set; } = new Random((int)DateTime.Now.Ticks);
 
-//resultados
+    //resultados
     private const int PrecioPorFraccion = 1500;
     private int FraccionesJugadas { get; set; } = 0;
     private int LoteriasJugadas { get; set; } = 0;
     private int DineroGastado { get; set; } = 0;
+    private string DineroGastadoString { get; set; } = string.Empty;
     private int DineroGanado { get; set; } = 0;
     private int BalanceTotal { get; set; } = 0;
 
@@ -58,16 +61,6 @@ public partial class Simulacion
         return this.VelocidadDeseada == velocidad;
     }
 
-    private void IniciarSimulacion()
-    {
-        this.HaSimulado = true;
-        this.SimulacionEnProgreso = true;
-        Timer = new System.Timers.Timer(ConseguirTiempoDeEspera());
-        Timer.Elapsed += OnTimerElapsed;
-        Timer.AutoReset = true;
-        Timer.Start();
-    }
-
     private int ConseguirTiempoDeEspera()
     {
         return this.VelocidadDeseada switch
@@ -82,6 +75,17 @@ public partial class Simulacion
             _ => 100
         };
     }
+
+    private void IniciarSimulacion()
+    {
+        this.HaSimulado = true;
+        this.SimulacionEnProgreso = true;
+        Timer = new System.Timers.Timer(ConseguirTiempoDeEspera());
+        Timer.Elapsed += OnTimerElapsed;
+        Timer.AutoReset = true;
+        Timer.Start();
+    }
+
 
     private void DetenerSimulacion()
     {
@@ -107,7 +111,7 @@ public partial class Simulacion
         {
             DetenerSimulacion();
             StateHasChanged();
-            Snackbar.Add("Simulación detenida por falta de números.", Severity.Error);
+            Snackbar.Add("Simulacion detenida por falta de fracciones.", Severity.Error);
         }
 
         if(this.VelocidadDeseada != this.VelocidadActual)
@@ -121,11 +125,12 @@ public partial class Simulacion
 
     private void GenerarNumerosGanadoresYTiqueteComprado()
     {
-        var NumerosMayoresGanadores = this.GenerarListaConNumerosNoRepetidos(3, 1, 99);
+        var NumerosMayoresGanadores = this.GenerarListaConNumerosNoRepetidos(4, 1, 99);
         var SeriesGanadoras = this.GenerarListaConNumerosNoRepetidos(3, 1, 999);
         PrimerPremio.SetNumeros(NumerosMayoresGanadores[0], SeriesGanadoras[0]);
         SegundoPremio.SetNumeros(NumerosMayoresGanadores[1], SeriesGanadoras[1]);
         TercerPremio.SetNumeros(NumerosMayoresGanadores[2], SeriesGanadoras[2]);
+        NumeroDuplicador = NumerosMayoresGanadores[3];
         this.GenerarNumerosJugados();        
     }
 
@@ -173,7 +178,7 @@ public partial class Simulacion
         }
         this.DineroGanado += dineroGanadoEnRonda;
         this.DineroGastado = FraccionesJugadas * PrecioPorFraccion;
-        this.BalanceTotal = DineroGanado - DineroGastado;        
+        this.BalanceTotal = DineroGanado - DineroGastado;
     }
 
     private int EvaluarTiqueteDeLoteria(TiqueteDeLoteria tiqueteDeLoteriaJugado)
@@ -189,9 +194,8 @@ public partial class Simulacion
         dineroGanado += EvaluarInversaAlMayor(numeroRevertido);
         dineroGanado += EvaluarInversaAlSegundo(numeroRevertido);
         dineroGanado += EvaluaraInversaAlTercero(numeroRevertido);
-        dineroGanado += EvaluarNumeroDuplicador();
-        return dineroGanado;
-        
+      
+        return EvaluarNumeroDuplicador(tiqueteDeLoteriaJugado.Mayor) ? dineroGanado *= 2 : dineroGanado;        
     }
 
     private int EvaluarPremioMayor(TiqueteDeLoteria tiqueteDeLoteriaJugado)
@@ -275,10 +279,9 @@ public partial class Simulacion
         return 0;
     }
 
-    //TODO: implementar numero duplicador y evitar repetidos en numeros sorteados.
-    private int EvaluarNumeroDuplicador()
+    private bool EvaluarNumeroDuplicador(int mayorJugado)
     {
-        return 0;
+        return NumeroDuplicador == mayorJugado;
     }
 
     private int RevertirNumero(int numero)
