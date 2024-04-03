@@ -1,159 +1,152 @@
-﻿@inject ISnackbar Snackbar
+﻿
+@if(HaSimulado)
+{
+    <MudGrid Justify="Justify.Center" Class="mt-5">
+            @*Settear velocidad de simulación*@
+            <MudItem xs="12" md="8">
+                <MudGrid Justify="Justify.Center">
+                    <MudItem xs="12" md="8">
+                        <MudCard Style="width: 100%">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6">Balance</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudSimpleTable Style="overflow-x: auto;">
+                                    <tbody>
+                                        <tr>
+                                            <td>Precio por fracción</td>
+                                            <td>₡@String.Format("{0:N0}", PrecioPorFraccion)</td>
+                                        </tr>
 
-<MudGrid Justify="Justify.Center" Class="mt-5">
-    @*Botón para inciar simulación*@
-    <MudItem xs="12" md="8">
-        <MudGrid Justify="Justify.Center">
-            <MudItem xs="12" md="10">
-                    <MudGrid Justify="Justify.Center">
-                        @if (@SimulacionEnProgreso)
-                        {
-                            <MudButton Variant="Variant.Filled" Color="Color.Error" @onclick="() => DetenerSimulacion()">Detener</MudButton>
-                        }
-                        else
-                        {
-                            <MudButton Variant="Variant.Filled" Color="Color.Info" @onclick="() => IniciarSimulacion()" Disabled="@DeshabilitarBotonDeInicio">Simular</MudButton>
-                        }
-                    </MudGrid>
+                                        <tr>
+                                            <td>Fracciones jugadas</td>
+                                            <td>@FraccionesJugadas</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dinero gastado</td>
+                                            <td>₡@String.Format("{0:N0}", DineroGastado)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dinero ganado</td>
+                                            <td>₡@String.Format("{0:N0}", DineroGanado)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Balance total</td>
+                                            <td>₡@String.Format("{0:N0}", BalanceTotal)</td>
+                                        </tr>
+                                    </tbody>
+                                </MudSimpleTable>
+                            </MudCardContent>
+                        </MudCard>
+                        <MudCard Style="width: 100%">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6">Tiempo transcurrido (Jugando solo la lotería de los viernes)</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudSimpleTable Style="overflow-x: auto;">
+                                    <tbody>
+                                        <tr>
+                                            <td>Días</td>
+                                            <td>@(LoteriasJugadas * 7)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Semanas</td>
+                                            <td>@LoteriasJugadas</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Años</td>
+                                            <td>@(LoteriasJugadas / 52)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Décadas</td>
+                                            <td>@(LoteriasJugadas / 520)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Siglos</td>
+                                            <td>@(LoteriasJugadas / 5200)</td>
+                                        </tr>
+                                    </tbody>
+                                </MudSimpleTable>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudCard Style="width: 100%">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6">Estadísticas</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudSimpleTable Style="overflow-x: auto;">
+                                    <thead>
+                                        <tr>
+                                            <th>Premio</th>
+                                            <th>Premio por fracción</th>
+                                            <th>Veces ganado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Premio Mayor</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.PrimerPremio])</td>
+                                            <td>@PremiosGanados[Premios.PrimerPremio]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Segundo Premio</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.SegundoPremio])</td>
+                                            <td>@PremiosGanados[Premios.SegundoPremio]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tercer Premio</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.TercerPremio])</td>
+                                            <td>@PremiosGanados[Premios.TercerPremio]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Igual a mayor, diferente serie</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualAMayorDiferenteSerie])</td>
+                                            <td>@PremiosGanados[Premios.IgualAMayorDiferenteSerie]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Igual a segundo, diferente serie</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualASegundoDiferenteSerie])</td>
+                                            <td>@PremiosGanados[Premios.IgualASegundoDiferenteSerie]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Igual a tercero, diferente serie</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualATerceroDiferenteSerie])</td>
+                                            <td>@PremiosGanados[Premios.IgualATerceroDiferenteSerie]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Inversa del mayor</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlMayor])</td>
+                                            <td>@PremiosGanados[Premios.InversaAlMayor]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Inversa del segundo</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlSegundo])</td>
+                                            <td>@PremiosGanados[Premios.InversaAlSegundo]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Inversa del tercero</td>
+                                            <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlTercero])</td>
+                                            <td>@PremiosGanados[Premios.InversaAlTercero]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Número duplicador</td>
+                                            <td>N/A</td>
+                                            <td>@PremiosGanados[Premios.NumeroDuplicador]</td>
+                                        </tr>
+                                    </tbody>
+                                </MudSimpleTable>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
             </MudItem>
-        </MudGrid>
-    </MudItem>
-
-    @if(HaSimulado)
-    {
-        @*Settear velocidad de simulación*@
-        <MudItem xs="12" md="8">
-            <MudGrid Justify="Justify.Center">
-                <MudItem xs="12" md="8">
-                    <MudCard Style="width: 100%">
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.h6">Estadísticas</MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                        <MudCardContent>
-                            <MudSimpleTable Style="overflow-x: auto;">
-                                <thead>
-                                    <tr>
-                                        <th>Estadística</th>
-                                        <th>Número</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Precio por fracción</td>
-                                        <td>₡@String.Format("{0:N0}", PrecioPorFraccion)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Fracciones jugadas</td>
-                                        <td>@FraccionesJugadas</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Chances jugados</td>
-                                        <td>@LoteriasJugadas</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Dinero gastado</td>
-                                        <td>₡@String.Format("{0:N0}", DineroGastado)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Dinero ganado</td>
-                                        <td>₡@String.Format("{0:N0}", DineroGanado)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Balance total</td>
-                                        <td>₡@String.Format("{0:N0}", BalanceTotal)</td>
-                                    </tr>
-                                </tbody>
-                            </MudSimpleTable>
-                        </MudCardContent>
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.h6">Velocidad</MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                        <MudCardActions>
-                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Text">
-                                <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Lenta)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Lenta)">Lenta</MudButton>
-                                <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Media)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Media)">Media</MudButton>
-                                <MudButton @onclick="() => SetearVelocidad(VelocidadDeSimulacion.Rapida)" Disabled="DeshabilitarBoton(VelocidadDeSimulacion.Rapida)">Rápida</MudButton>
-                            </MudButtonGroup>
-                        </MudCardActions>
-                    </MudCard>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudCard Style="width: 100%">
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.h6">Estadísticas</MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                        <MudCardContent>
-                            <MudSimpleTable Style="overflow-x: auto;">
-                                <thead>
-                                    <tr>
-                                        <th>Premio</th>
-                                        <th>Premio por fracción</th>
-                                        <th>Veces ganado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Premio Mayor</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.PrimerPremio])</td>
-                                        <td>@PremiosGanados[Premios.PrimerPremio]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Segundo Premio</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.SegundoPremio])</td>
-                                        <td>@PremiosGanados[Premios.SegundoPremio]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Tercer Premio</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.TercerPremio])</td>
-                                        <td>@PremiosGanados[Premios.TercerPremio]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Igual a mayor, diferente serie</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualAMayorDiferenteSerie])</td>
-                                        <td>@PremiosGanados[Premios.IgualAMayorDiferenteSerie]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Igual a segundo, diferente serie</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualASegundoDiferenteSerie])</td>
-                                        <td>@PremiosGanados[Premios.IgualASegundoDiferenteSerie]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Igual a tercero, diferente serie</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualATerceroDiferenteSerie])</td>
-                                        <td>@PremiosGanados[Premios.IgualATerceroDiferenteSerie]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Inversa del mayor</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlMayor])</td>
-                                        <td>@PremiosGanados[Premios.InversaAlMayor]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Inversa del segundo</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlSegundo])</td>
-                                        <td>@PremiosGanados[Premios.InversaAlSegundo]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Inversa del tercero</td>
-                                        <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlTercero])</td>
-                                        <td>@PremiosGanados[Premios.InversaAlTercero]</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Número duplicador</td>
-                                        <td>N/A</td>
-                                        <td>@PremiosGanados[Premios.NumeroDuplicador]</td>
-                                    </tr>
-                                </tbody>
-                            </MudSimpleTable>
-                        </MudCardContent>
-                    </MudCard>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-    }
 </MudGrid>
+}

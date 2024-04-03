@@ -28,22 +28,34 @@ public partial class Simulacion
     }
 
     [Parameter, EditorRequired]
-    public List<LoteriaComprada> NumerosJugadosParam { get; set; } = null!;
-    private List<LoteriaComprada> NumerosJugados { get; set; } = null!;
-    private bool DebeActualizarNumerosJugados { get; set; } = false;
-    private bool DeshabilitarBotonDeInicio { get; set; } = true;
+    public List<LoteriaComprada> NumerosJugados { get; set; } = null!;
 
-    private VelocidadDeSimulacion VelocidadDeseada { get; set; } = VelocidadDeSimulacion.Media;
-    private VelocidadDeSimulacion VelocidadActual { get; set; } = VelocidadDeSimulacion.Media;
-    private TiqueteDeLoteria PrimerPremio { get; set; } = new TiqueteDeLoteria();
-    private TiqueteDeLoteria SegundoPremio { get; set; } = new TiqueteDeLoteria();
-    private TiqueteDeLoteria TercerPremio { get; set; } = new TiqueteDeLoteria();
-    private int NumeroDuplicador { get; set; } = 0;
-    private List<TiqueteDeLoteria> LoteriaJugada { get; set; } = new List<TiqueteDeLoteria>();
-    private bool SimulacionEnProgreso { get; set; } = false;
+    [Parameter, EditorRequired]
+    public int? LoteriasPorSegundo { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public bool DeberiaEstarSimulando { get; set; } = false;
+
+    [Parameter, EditorRequired]
+    public bool DeberiaReiniciarSimulacion { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<bool> DeberiaReiniciarSimulacionChanged { get; set; }
+
+    // Variables internas para los parámetros.
+    private List<LoteriaComprada> NumerosJugadosInterno { get; set; } = null!;
+    private int? LoteriasPorSegundoInterno { get; set; } = null!;
+    private bool DeberiaEstarSimulandoInterno { get; set; } = false;
+
+    // Variables de la simulación.
     private bool HaSimulado { get; set; } = false;
     private System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
     private Random GeneradorDeNumerosAleatorios { get; set; } = new Random((int)DateTime.Now.Ticks);
+    private TiqueteDeLoteria PrimerPremio { get; set; } = new TiqueteDeLoteria();
+    private TiqueteDeLoteria SegundoPremio { get; set; } = new TiqueteDeLoteria();
+    private TiqueteDeLoteria TercerPremio { get; set; } = new TiqueteDeLoteria();
+    private List<TiqueteDeLoteria> LoteriaJugada { get; set; } = new List<TiqueteDeLoteria>();
+    private int NumeroDuplicador { get; set; } = 0;
 
     //resultados
     private const int PrecioPorFraccion = 1500;
@@ -80,63 +92,56 @@ public partial class Simulacion
         {Premios.InversaAlTercero, 1500}
     };
 
-    private  void Reiniciar()
-    {        
-        this.SimulacionEnProgreso = false;
+    protected override async Task OnParametersSetAsync()
+    {
+        // Solo actualizamos los parámetros si se cambia el estado de la simulación.
+        if (this.DeberiaEstarSimulandoInterno != this.DeberiaEstarSimulando)
+        {
+            this.NumerosJugadosInterno = this.NumerosJugados;
+            this.LoteriasPorSegundoInterno = this.LoteriasPorSegundo;
+            this.DeberiaEstarSimulandoInterno = this.DeberiaEstarSimulando;        
+            if (NumerosJugadosInterno.Any() && LoteriasPorSegundoInterno.HasValue && DeberiaEstarSimulandoInterno)
+            {
+                this.IniciarSimulacion();
+            }
+            else if (!DeberiaEstarSimulandoInterno && HaSimulado)
+            {
+                this.DetenerSimulacion();
+            }
+        }
+
+        if(this.DeberiaReiniciarSimulacion)
+        {
+            await this.Reiniciar();
+        }        
+    }
+
+    private  async Task Reiniciar()
+    {
         this.FraccionesJugadas = 0;
         this.LoteriasJugadas = 0;
         this.DineroGastado = 0;
         this.DineroGanado = 0;
         this.BalanceTotal = 0;
-        ReiniciarDiccionario();
-    }
 
-    private void ReiniciarDiccionario()
-    {
         foreach (KeyValuePair<Premios, int> premio in PremiosGanados)
         {
             PremiosGanados[premio.Key] = 0;
         }
+
+        this.DeberiaReiniciarSimulacion = false;
+        await DeberiaReiniciarSimulacionChanged.InvokeAsync(this.DeberiaReiniciarSimulacion);
     }
 
-    protected override void OnParametersSet()
+    private double ConseguirTiempoDeEspera()
     {
-        this.DeshabilitarBotonDeInicio = NumerosJugadosParam.Any() ? false : true;
-        if(NumerosJugados != NumerosJugadosParam)
-        {
-            DebeActualizarNumerosJugados = true;
-        }
-    }
-
-    private void SetearVelocidad(VelocidadDeSimulacion velocidad)
-    {
-        this.VelocidadDeseada = velocidad;
-    }
-
-    private bool DeshabilitarBoton(VelocidadDeSimulacion velocidad)
-    {
-        return this.VelocidadDeseada == velocidad;
-    }
-
-    private int ConseguirTiempoDeEspera()
-    {
-        return this.VelocidadDeseada switch
-        {
-            // 1000 ms = 1 segundo
-            // 10 veces por segundo
-            VelocidadDeSimulacion.Lenta => 100,
-            // 40 veces por segundo
-            VelocidadDeSimulacion.Media => 25,
-            // 100 veces por segundo
-            VelocidadDeSimulacion.Rapida => 10,
-            _ => 100
-        };
+        //Asume que los parametros no son nulos.
+        return (double)1000 / (double)this.LoteriasPorSegundoInterno!.Value;
     }
 
     private void IniciarSimulacion()
     {
         this.HaSimulado = true;
-        this.SimulacionEnProgreso = true;
         Timer = new System.Timers.Timer(ConseguirTiempoDeEspera());
         Timer.Elapsed += OnTimerElapsed;
         Timer.AutoReset = true;
@@ -147,37 +152,13 @@ public partial class Simulacion
     private void DetenerSimulacion()
     {
         Timer.Stop();
-        this.SimulacionEnProgreso = false;
     }
 
     private void OnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
-        if (DebeActualizarNumerosJugados)
-        {
-            this.NumerosJugados = this.NumerosJugadosParam;
-            this.DebeActualizarNumerosJugados = false;
-        }
-
-        if (NumerosJugados != null && NumerosJugados.Any())
-        {
-            this.GenerarNumerosGanadoresYTiqueteComprado();
-            this.EvaluarLoteria();
-            StateHasChanged();
-        }
-        else
-        {
-            DetenerSimulacion();
-            StateHasChanged();
-            Snackbar.Add("Simulacion detenida por falta de fracciones.", Severity.Error);
-        }
-
-        if(this.VelocidadDeseada != this.VelocidadActual)
-        {
-            this.Timer.Stop();
-            this.Timer.Interval = ConseguirTiempoDeEspera();
-            this.Timer.Start();
-            this.VelocidadActual = this.VelocidadDeseada;
-        }
+        this.GenerarNumerosGanadoresYTiqueteComprado();
+        this.EvaluarLoteria();
+        StateHasChanged();
     }
 
     private void GenerarNumerosGanadoresYTiqueteComprado()
@@ -212,7 +193,7 @@ public partial class Simulacion
     private void GenerarNumerosJugados()
     {
         LoteriaJugada = new List<TiqueteDeLoteria>();
-        foreach (LoteriaComprada loteria in NumerosJugados)
+        foreach (LoteriaComprada loteria in NumerosJugadosInterno)
         {
             for (int i = 0; i < loteria.NumeroDeFracciones; i++)
             {
