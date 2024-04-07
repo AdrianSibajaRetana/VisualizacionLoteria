@@ -65,6 +65,11 @@ public partial class Simulacion
     private int DineroGanado { get; set; } = 0;
     private int BalanceTotal { get; set; } = 0;
 
+    //tablas
+    private bool TablaBalanceAbierta { get; set; } = true;
+    private bool TablaTiempoAbierta { get; set; } = false;
+    private bool TablaPremiosAbierta { get; set; } = false;
+
     private Dictionary<Premios, int> PremiosGanados { get; set; } = new Dictionary<Premios, int>()
     {
         {Premios.PrimerPremio, 0},

@@ -9,7 +9,7 @@
     <MudGrid Class="mt-5 px-3" Justify="Justify.Center">
         <MudItem xs="12">
             <MudGrid Justify="Justify.Center">
-                <MudItem xs="12" md="5">
+                <MudItem xs="12" md="7" Style="max-width: 1010px">
                     <MudGrid Justify="Justify.Center">
                         @*Item #1: Titulo*@
                         <MudItem xs="12" md="12">
@@ -20,13 +20,13 @@
                             <MudText Align="Align.Center">Some long pricing text should go here maybe? who knows what text you would want here, i guess i cant fill it in for you.</MudText>
                         </MudItem>
                         @*Item #3: Contenido*@
-                        <MudItem xs="12" md="12">
-                            <MudGrid Justify="Justify.FlexStart">
+                        <MudItem xs="12" md="12" Style="width: 100%;">
+                            <MudGrid Justify="Justify.SpaceEvenly">
                                 @*Item #3.1: Simulación*@
-                                <MudItem xs="12" md="6">
+                                <MudItem xs="12" md="6" Style="max-width: 495px">
                                     <MudGrid Justify="Justify.Center">
                                         <MudItem xs="12" md="12">
-                                            <MudCard Style="width: 100%">
+                                            <MudCard Class="pa-5" Elevation="4">
                                                 <MudCardHeader>
                                                     <CardHeaderAvatar>
                                                         <MudAvatar Size="Size.Small" Color="Color.Primary">1</MudAvatar>
@@ -43,7 +43,7 @@
                                                 @if (NumerosJugados.Any())
                                                 {
                                                     <MudCardContent>
-                                                        <MudDataGrid Items="@NumerosJugados" Filterable="false" SortMode="@SortMode.None" Groupable="false">
+                                                        <MudDataGrid Items="@NumerosJugados" Filterable="false" SortMode="@SortMode.None" Groupable="false" Breakpoint="Breakpoint.None">
                                                             <Columns>
                                                                 <PropertyColumn Property="x => x.NumeroMayor" Title="Numero mayor" />
                                                                 <PropertyColumn Property="x => x.NumeroDeFracciones" Title="Fracciones" />
@@ -74,16 +74,6 @@
                                                         <MudText Typo="Typo.body1">Seleccione la velocidad de la simulación.</MudText>
                                                     </CardHeaderContent>
                                                 </MudCardHeader>
-                                                @*
-                                                <MudCardContent>
-                                                    <MudSelect T="int?" Label="Loterías por segundo" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="LoteriasPorSegundo" Disabled="SimulacionEnProgreso">
-                                                        <MudSelectItem T="int?" Value="10" />
-                                                        <MudSelectItem T="int?" Value="100" />
-                                                        <MudSelectItem T="int?" Value="1000" />
-                                                        <MudSelectItem T="int?" Value="10000" />
-                                                    </MudSelect>
-                                                </MudCardContent>
-                                                *@
                                                 <MudCardContent>
                                                     <MudGrid Justify="Justify.Center">
                                                         <MudItem>
@@ -95,31 +85,76 @@
                                                         </MudItem>
                                                     </MudGrid>
                                                 </MudCardContent>
+                                                <MudCardHeader>
+                                                    <CardHeaderAvatar>
+                                                        <MudAvatar Size="Size.Small" Color="Color.Primary">3</MudAvatar>
+                                                    </CardHeaderAvatar>
+                                                    <CardHeaderContent>
+                                                        <MudText Typo="Typo.body1">A jugar!</MudText>
+                                                    </CardHeaderContent>
+                                                </MudCardHeader>
+                                                <MudCardContent>
+                                                    <MudGrid Justify="Justify.Center" Spacing="3">
+                                                        @if (@SimulacionEnProgreso)
+                                                        {
+                                                            <MudItem>
+                                                                <MudButton Variant="Variant.Outlined" Color="Color.Error" @onclick="() => IniciarODetenerSimulacion()" StartIcon="@Icons.Material.Filled.Pause">Detener</MudButton>
+                                                            </MudItem>
+                                                        }
+                                                        else
+                                                        {
+                                                            <MudItem>
+                                                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" @onclick="() => IniciarODetenerSimulacion()" Disabled="@DeshabilitarBotonDeSimulacion" StartIcon="@Icons.Material.Filled.PlayArrow">Simular</MudButton>
+                                                            </MudItem>
+                                                        }
+                                                        <MudItem>
+                                                            <MudButton Variant="Variant.Outlined" Color="Color.Info" @onclick="() => ReiniciarSimulacion()" Disabled="@DeshabilitarBotonDeReiniciado" StartIcon="@Icons.Material.Filled.RestartAlt">Reiniciar</MudButton>
+                                                        </MudItem>
+                                                    </MudGrid>
+                                                </MudCardContent>
                                             </MudCard>
-                                        </MudItem>
-                                        <MudItem xs="12" md="10">
-                                            <MudGrid Justify="Justify.Center" Spacing="3">
-                                                @if (@SimulacionEnProgreso)
-                                                {
-                                                    <MudItem>
-                                                        <MudButton Variant="Variant.Filled" Color="Color.Error" @onclick="() => IniciarODetenerSimulacion()">Detener</MudButton>
-                                                    </MudItem>
-                                                }
-                                                else
-                                                {
-                                                    <MudItem>
-                                                        <MudButton Variant="Variant.Filled" Color="Color.Info" @onclick="() => IniciarODetenerSimulacion()" Disabled="@DeshabilitarBotonDeSimulacion">Simular</MudButton>
-                                                    </MudItem>
-                                                }
-                                                <MudItem>
-                                                    <MudButton Variant="Variant.Filled" Color="Color.Info" @onclick="() => ReiniciarSimulacion()" Disabled="@DeshabilitarBotonDeReiniciado">Reiniciar</MudButton>
-                                                </MudItem>
-                                            </MudGrid>
                                         </MudItem>
                                     </MudGrid>
                                 </MudItem>
+                                @*Item #3.2: Estadísticas*@
+                                <MudItem xs="12" md="6" Style="max-width: 495px">
+                                    <MudCard Class="pa-5" Elevation="4">
+                                        <MudCardHeader>
+                                            <CardHeaderContent>
+                                                <MudText Typo="Typo.body1"><b>Premios</b></MudText>
+                                            </CardHeaderContent>
+                                        </MudCardHeader>
+                                        <MudCardContent>
+                                            <MudSimpleTable Dense=true>
+                                                <thead>
+                                                    <tr>
+                                                        @foreach (var h in PremiosHeaders)
+                                                        {
+                                                            <th>@h</th>
+                                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var lista in PremiosRows)
+                                                    {
+                                                        <tr>
+                                                            @foreach (var data in lista)
+                                                            {
+                                                                <td>@data</td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </MudSimpleTable>
+                                        </MudCardContent>
+                                    </MudCard>
+                                </MudItem>
+                                @*Item #3.3: Simulación*@
+                                 <MudItem xs="12" md="12">
+                                    <Simulacion NumerosJugados="NumerosJugados" LoteriasPorSegundo="LoteriasPorSegundo" DeberiaEstarSimulando="SimulacionEnProgreso" @bind-DeberiaReiniciarSimulacion="DeberiaReiniciarSimulacion" />
+                                </MudItem>
                             </MudGrid>
-                        </MudItem>                        
+                        </MudItem>
                     </MudGrid>
                 </MudItem>
             </MudGrid>
@@ -128,7 +163,6 @@
                 
 
 
-    <Simulacion NumerosJugados="NumerosJugados" LoteriasPorSegundo="LoteriasPorSegundo" DeberiaEstarSimulando="SimulacionEnProgreso" @bind-DeberiaReiniciarSimulacion="DeberiaReiniciarSimulacion" />
 
 </MudContainer>
 
@@ -142,6 +176,21 @@
     private bool DeshabilitarBotonDeReiniciado => !HaSimulado;
     private bool HaSimulado = false;
     private bool DeberiaReiniciarSimulacion = false;
+
+    private readonly string[] PremiosHeaders = { "Tipo", "Probabilidad (1 en...)", "Premio"};
+    private readonly List<string[]> PremiosRows = new List<string[]>
+    {
+        new string[] { "Premio Mayor", "0", "₡24,000,000" },
+        new string[] { "Segundo Premio", "0", "₡7,400,000" },
+        new string[] { "Tercer Premio", "0", "₡1,800,000" },
+        new string[] { "Igual a mayor, diferente serie", "0", "₡40,000" },
+        new string[] { "Igual a segundo, diferente serie", "0", "₡8,400" },
+        new string[] { "Igual a tercero, diferente serie", "0", "₡6,000" },
+        new string[] { "Inversa del mayor", "0", "₡3,000" },
+        new string[] { "Inversa del segundo", "0", "₡2,400" },
+        new string[] { "Inversa del tercero", "0", "₡1,500" },
+        new string[] { "Número duplicador", "0", "₡0" }
+    };
 
     private async Task AñadirNumero()
     {
