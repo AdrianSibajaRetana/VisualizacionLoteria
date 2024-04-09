@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using VisualizacionLoteria.Pages.Components
 @using VisualizacionLoteria.Pages.Models;
+@using VisualizacionLoteria.Pages.Util;
 @inject IDialogService DialogService
 
 <PageTitle>Simulación</PageTitle>
@@ -135,16 +136,16 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach (var lista in PremiosRows)
+                                                    @foreach (var kvp in PremiosLoteria.InformacionPremios)
                                                     {
                                                         <tr>
-                                                            @foreach (var data in lista)
-                                                            {
-                                                                <td>@data</td>
-                                                            }
+                                                            <td>@PremiosLoteria.TipoPremioAString(kvp.Key)</td>
+                                                            <td>@kvp.Value.probabilidad</td>
+                                                            <td>@PremiosLoteria.PremioAString(kvp.Value.premio)</td>
                                                         </tr>
                                                     }
                                                 </tbody>
+
                                             </MudSimpleTable>
                                         </MudCardContent>
                                     </MudCard>
@@ -159,11 +160,7 @@
                 </MudItem>
             </MudGrid>
         </MudItem>
-    </MudGrid>
-                
-
-
-
+    </MudGrid>                
 </MudContainer>
 
 @code
@@ -176,21 +173,8 @@
     private bool DeshabilitarBotonDeReiniciado => !HaSimulado;
     private bool HaSimulado = false;
     private bool DeberiaReiniciarSimulacion = false;
-
     private readonly string[] PremiosHeaders = { "Tipo", "Probabilidad (1 en...)", "Premio por fracción"};
-    private readonly List<string[]> PremiosRows = new List<string[]>
-    {
-        new string[] { "Premio Mayor", "98,000", "₡24,000,000" },
-        new string[] { "Segundo Premio", "98,000", "₡7,400,000" },
-        new string[] { "Tercer Premio", "98,000", "₡1,800,000" },
-        new string[] { "Igual a mayor, diferente serie", "100", "₡40,000" },
-        new string[] { "Igual a segundo, diferente serie", "100", "₡8,400" },
-        new string[] { "Igual a tercero, diferente serie", "100", "₡6,000" },
-        new string[] { "Inversa del mayor", "100", "₡3,000" },
-        new string[] { "Inversa del segundo", "100", "₡2,400" },
-        new string[] { "Inversa del tercero", "100", "₡1,500" },
-        new string[] { "Número duplicador", "100", "₡3000" }
-    };
+
 
     private async Task AñadirNumero()
     {
