@@ -18,7 +18,7 @@
                         </MudItem>
                         @*Item #2: Subtitulo*@
                         <MudItem xs="12" md="12">
-                            <MudText Align="Align.Center">Some long pricing text should go here maybe? who knows what text you would want here, i guess i cant fill it in for you.</MudText>
+                            <MudText Align="Align.Center">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ultricies dui ac nunc aliquet, vitae maximus felis varius. Nunc elementum vulputate blandit. Donec rhoncus mollis. </MudText>
                         </MudItem>
                         @*Item #3: Contenido*@
                         <MudItem xs="12" md="12" Style="width: 100%;">
@@ -166,7 +166,6 @@
 @code
 {
     public List<LoteriaComprada> NumerosJugados { get; set; } = new List<LoteriaComprada>();
-    private string mensajeDeboton = "Añadir número";
     private int? LoteriasPorSegundo = null;
     private bool SimulacionEnProgreso = false;
     private bool DeshabilitarBotonDeSimulacion => !NumerosJugados.Any() || LoteriasPorSegundo == null;
@@ -189,33 +188,13 @@
             //In a real world scenario we would reload the data from the source here since we "removed" it in the dialog already.
             LoteriaComprada loteriaComprada = (LoteriaComprada)result.Data;
             NumerosJugados.Add(loteriaComprada);
-        }
-        cambiarMensajeDeBoton();
+        }        
     }
 
     private void BorrarNumero(LoteriaComprada item)
     {
         NumerosJugados.Remove(item);
-        cambiarMensajeDeBoton();
     }
-
-    private void cambiarMensajeDeBoton()
-    {
-        if (NumerosJugados.Any())
-        {
-            mensajeDeboton = "Añadir otro número";
-        }
-        else
-        {
-            mensajeDeboton = "Añadir número";
-        }
-
-        InvokeAsync(() =>
-        {
-            StateHasChanged();
-        });
-    }
-
 
     private void IniciarODetenerSimulacion()
     {

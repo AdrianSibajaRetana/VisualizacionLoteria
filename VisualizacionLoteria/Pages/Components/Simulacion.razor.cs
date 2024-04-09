@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using VisualizacionLoteria.Pages.Models;
+using VisualizacionLoteria.Pages.Util;
 
 namespace VisualizacionLoteria.Pages.Components;
 
@@ -70,31 +71,21 @@ public partial class Simulacion
     private bool TablaTiempoAbierta { get; set; } = false;
     private bool TablaPremiosAbierta { get; set; } = false;
 
-    private Dictionary<Premios, int> PremiosGanados { get; set; } = new Dictionary<Premios, int>()
-    {
-        {Premios.PrimerPremio, 0},
-        {Premios.SegundoPremio, 0},
-        {Premios.TercerPremio, 0},
-        {Premios.IgualAMayorDiferenteSerie, 0},
-        {Premios.IgualASegundoDiferenteSerie, 0},
-        {Premios.IgualATerceroDiferenteSerie, 0},
-        {Premios.InversaAlMayor, 0},
-        {Premios.InversaAlSegundo, 0},
-        {Premios.InversaAlTercero, 0},
-        {Premios.NumeroDuplicador, 0}
-    };
+    //temp 
+    private bool usarSimulacionLiteral = false;
 
-    private Dictionary<Premios, int> MontoPorPremio { get; set; } = new Dictionary<Premios, int>()
+    private Dictionary<PremiosLoteria.TipoPremio, int> PremiosGanados { get; set; } = new Dictionary<PremiosLoteria.TipoPremio, int>()
     {
-        {Premios.PrimerPremio, 24000000},
-        {Premios.SegundoPremio, 7400000},
-        {Premios.TercerPremio, 1800000},
-        {Premios.IgualAMayorDiferenteSerie, 40000},
-        {Premios.IgualASegundoDiferenteSerie, 8400},
-        {Premios.IgualATerceroDiferenteSerie, 6000},
-        {Premios.InversaAlMayor, 3000},
-        {Premios.InversaAlSegundo, 2400},
-        {Premios.InversaAlTercero, 1500}
+        {PremiosLoteria.TipoPremio.PremioMayor, 0},
+        {PremiosLoteria.TipoPremio.SegundoPremio, 0},
+        {PremiosLoteria.TipoPremio.TercerPremio, 0},
+        {PremiosLoteria.TipoPremio.IgualAMayorDiferenteSerie, 0},
+        {PremiosLoteria.TipoPremio.IgualASegundoDiferenteSerie, 0},
+        {PremiosLoteria.TipoPremio.IgualATerceroDiferenteSerie, 0},
+        {PremiosLoteria.TipoPremio.InversaDelMayor, 0},
+        {PremiosLoteria.TipoPremio.InversaDelSegundo, 0},
+        {PremiosLoteria.TipoPremio.InversaDelTercero, 0},
+        {PremiosLoteria.TipoPremio.NumeroDuplicador, 0}
     };
 
     protected override async Task OnParametersSetAsync()
@@ -129,9 +120,9 @@ public partial class Simulacion
         this.DineroGanado = 0;
         this.BalanceTotal = 0;
 
-        foreach (KeyValuePair<Premios, int> premio in PremiosGanados)
+        foreach (var kvp in PremiosGanados)
         {
-            PremiosGanados[premio.Key] = 0;
+            PremiosGanados[kvp.Key] = 0;
         }
 
         this.DeberiaReiniciarSimulacion = false;
@@ -217,7 +208,14 @@ public partial class Simulacion
         foreach (TiqueteDeLoteria tiqueteDeLoteriaJugado in LoteriaJugada)
         {
             this.FraccionesJugadas++;
-            dineroGanadoEnRonda += this.EvaluarTiqueteDeLoteria(tiqueteDeLoteriaJugado);
+            if(usarSimulacionLiteral)
+            {
+                dineroGanadoEnRonda += this.EvaluarTiqueteDeLoteria(tiqueteDeLoteriaJugado);
+            }
+            else
+            {
+                dineroGanadoEnRonda += this.EvaluarTiqueteDeLoteria();
+            }
         }
         this.DineroGanado += dineroGanadoEnRonda;
         this.DineroGastado = FraccionesJugadas * PrecioPorFraccion;
@@ -237,16 +235,34 @@ public partial class Simulacion
         dineroGanado += EvaluarInversaAlMayor(numeroRevertido);
         dineroGanado += EvaluarInversaAlSegundo(numeroRevertido);
         dineroGanado += EvaluaraInversaAlTercero(numeroRevertido);
-      
-        return EvaluarNumeroDuplicador(tiqueteDeLoteriaJugado.Mayor) ? dineroGanado *= 2 : dineroGanado;        
+        dineroGanado += EvaluarNumeroDuplicador(tiqueteDeLoteriaJugado.Mayor);
+        return dineroGanado;
+    }
+
+    private int EvaluarTiqueteDeLoteria()
+    {
+        int premioTotal = 0;
+        foreach (var kvp in PremiosLoteria.InformacionPremios)
+        {
+            // Se genera un número entre 0 y la probabilidad del premio.
+            // Por ejemplo, 0 a 98000 para el premio mayor.
+            // Si el número es 0, se gana el premio.
+            int numero = this.GeneradorDeNumerosAleatorios.Next(kvp.Value.probabilidad);
+            if (numero == 0)
+            {
+                PremiosGanados[kvp.Key]++;
+                premioTotal += kvp.Value.premio;                
+            }
+        }
+        return premioTotal;
     }
 
     private int EvaluarPremioMayor(TiqueteDeLoteria tiqueteDeLoteriaJugado)
     {
         if (tiqueteDeLoteriaJugado.Mayor == PrimerPremio.Mayor && tiqueteDeLoteriaJugado.Serie == PrimerPremio.Serie)
         {
-            PremiosGanados[Premios.PrimerPremio]++;
-            return MontoPorPremio[Premios.PrimerPremio];
+            PremiosGanados[PremiosLoteria.TipoPremio.PremioMayor]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.PremioMayor].premio;
         }
         return 0;
     }
@@ -255,8 +271,8 @@ public partial class Simulacion
     {
         if (tiqueteDeLoteriaJugado.Mayor == SegundoPremio.Mayor && tiqueteDeLoteriaJugado.Serie == SegundoPremio.Serie)
         {
-            PremiosGanados[Premios.SegundoPremio]++;
-            return MontoPorPremio[Premios.SegundoPremio];
+            PremiosGanados[PremiosLoteria.TipoPremio.SegundoPremio]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.SegundoPremio].premio;
         }
         return 0;
     }
@@ -265,8 +281,8 @@ public partial class Simulacion
     {
         if (tiqueteDeLoteriaJugado.Mayor == TercerPremio.Mayor && tiqueteDeLoteriaJugado.Serie == TercerPremio.Serie)
         {
-            PremiosGanados[Premios.TercerPremio]++;
-            return MontoPorPremio[Premios.TercerPremio];
+            PremiosGanados[PremiosLoteria.TipoPremio.TercerPremio]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.TercerPremio].premio;
         }
         return 0;
     }
@@ -275,8 +291,8 @@ public partial class Simulacion
     {
         if(tiqueteDeLoteriaJugado.Mayor == PrimerPremio.Mayor && tiqueteDeLoteriaJugado.Serie != PrimerPremio.Serie)
         {
-            PremiosGanados[Premios.IgualAMayorDiferenteSerie]++;
-            return MontoPorPremio[Premios.IgualAMayorDiferenteSerie];
+            PremiosGanados[PremiosLoteria.TipoPremio.IgualAMayorDiferenteSerie]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.IgualAMayorDiferenteSerie].premio;
         }
         return 0;
     }
@@ -285,8 +301,8 @@ public partial class Simulacion
     {
         if(tiqueteDeLoteriaJugado.Mayor == SegundoPremio.Mayor && tiqueteDeLoteriaJugado.Serie != SegundoPremio.Serie)
         {
-            PremiosGanados[Premios.IgualASegundoDiferenteSerie]++;
-            return MontoPorPremio[Premios.IgualASegundoDiferenteSerie];
+            PremiosGanados[PremiosLoteria.TipoPremio.IgualASegundoDiferenteSerie]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.IgualASegundoDiferenteSerie].premio;
         }
         return 0;
     }
@@ -295,8 +311,8 @@ public partial class Simulacion
     {
         if(tiqueteDeLoteriaJugado.Mayor == TercerPremio.Mayor && tiqueteDeLoteriaJugado.Serie != TercerPremio.Serie)
         {
-            PremiosGanados[Premios.IgualATerceroDiferenteSerie]++;
-            return MontoPorPremio[Premios.IgualATerceroDiferenteSerie];
+            PremiosGanados[PremiosLoteria.TipoPremio.IgualATerceroDiferenteSerie]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.IgualATerceroDiferenteSerie].premio;
         }
         return 0;
     }
@@ -305,8 +321,8 @@ public partial class Simulacion
     {
         if(inversaJugada == PrimerPremio.Mayor)
         {
-            PremiosGanados[Premios.InversaAlMayor]++;
-            return MontoPorPremio[Premios.InversaAlMayor];
+            PremiosGanados[PremiosLoteria.TipoPremio.InversaDelMayor]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.InversaDelMayor].premio;
         }
         return 0;
     }
@@ -315,8 +331,8 @@ public partial class Simulacion
     {
         if(inversaJugada == SegundoPremio.Mayor)
         {
-            PremiosGanados[Premios.InversaAlSegundo]++;
-            return MontoPorPremio[Premios.InversaAlSegundo];
+            PremiosGanados[PremiosLoteria.TipoPremio.InversaDelSegundo]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.InversaDelSegundo].premio;
         }
         return 0;
     }
@@ -325,20 +341,20 @@ public partial class Simulacion
     {
         if(inversaJugada == TercerPremio.Mayor)
         {
-            PremiosGanados[Premios.InversaAlTercero]++;
-            return MontoPorPremio[Premios.InversaAlTercero];
+            PremiosGanados[PremiosLoteria.TipoPremio.InversaDelTercero]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.InversaDelTercero].premio;
         }
         return 0;
     }
 
-    private bool EvaluarNumeroDuplicador(int mayorJugado)
+    private int EvaluarNumeroDuplicador(int mayorJugado)
     {
         if (NumeroDuplicador == mayorJugado)
         {
-            PremiosGanados[Premios.NumeroDuplicador]++;
-            return true;
+            PremiosGanados[PremiosLoteria.TipoPremio.NumeroDuplicador]++;
+            return PremiosLoteria.InformacionPremios[PremiosLoteria.TipoPremio.NumeroDuplicador].premio;
         }
-        return false;
+        return 0;
     }
 
     private int RevertirNumero(int numero)

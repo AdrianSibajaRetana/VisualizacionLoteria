@@ -1,4 +1,5 @@
-﻿@if(HaSimulado)
+﻿@using VisualizacionLoteria.Pages.Util;
+@if(HaSimulado)
 {
     @*Settear velocidad de simulación*@
     <MudCard Style="width: 100%;">
@@ -94,57 +95,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Premio Mayor</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.PrimerPremio])</td>
-                                    <td>@PremiosGanados[Premios.PrimerPremio]</td>
-                                </tr>
-                                <tr>
-                                    <td>Segundo Premio</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.SegundoPremio])</td>
-                                    <td>@PremiosGanados[Premios.SegundoPremio]</td>
-                                </tr>
-                                <tr>
-                                    <td>Tercer Premio</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.TercerPremio])</td>
-                                    <td>@PremiosGanados[Premios.TercerPremio]</td>
-                                </tr>
-                                <tr>
-                                    <td>Igual a mayor, diferente serie</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualAMayorDiferenteSerie])</td>
-                                    <td>@PremiosGanados[Premios.IgualAMayorDiferenteSerie]</td>
-                                </tr>
-                                <tr>
-                                    <td>Igual a segundo, diferente serie</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualASegundoDiferenteSerie])</td>
-                                    <td>@PremiosGanados[Premios.IgualASegundoDiferenteSerie]</td>
-                                </tr>
-                                <tr>
-                                    <td>Igual a tercero, diferente serie</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.IgualATerceroDiferenteSerie])</td>
-                                    <td>@PremiosGanados[Premios.IgualATerceroDiferenteSerie]</td>
-                                </tr>
-                                <tr>
-                                    <td>Inversa del mayor</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlMayor])</td>
-                                    <td>@PremiosGanados[Premios.InversaAlMayor]</td>
-                                </tr>
-                                <tr>
-                                    <td>Inversa del segundo</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlSegundo])</td>
-                                    <td>@PremiosGanados[Premios.InversaAlSegundo]</td>
-                                </tr>
-                                <tr>
-                                    <td>Inversa del tercero</td>
-                                    <td>₡@String.Format("{0:N0}", MontoPorPremio[Premios.InversaAlTercero])</td>
-                                    <td>@PremiosGanados[Premios.InversaAlTercero]</td>
-                                </tr>
-                                <tr>
-                                    <td>Número duplicador</td>
-                                    <td>N/A</td>
-                                    <td>@PremiosGanados[Premios.NumeroDuplicador]</td>
-                                </tr>
-                            </tbody>
+                                @foreach (var kvp in PremiosLoteria.InformacionPremios)
+                                {
+                                    <tr>
+                                        <td>@PremiosLoteria.TipoPremioAString(kvp.Key)</td>
+                                        <td>@PremiosLoteria.PremioAString(kvp.Value.premio)</td>
+                                        <td>@kvp.Value.probabilidad</td>
+                                        <td>@PremiosGanados[kvp.Key]</td>
+                                    </tr>
+                                }
+                            </tbody>                            
                         </MudSimpleTable>
                     </MudCardContent>
                 </ChildContent>                
